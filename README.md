@@ -12,7 +12,7 @@ Use singe 'g' command to print all plugin flags.
 
 ## Set
 
-Use 's <flag> <1/0>' command to set flag's value.
+Use 's (flag) (1/0)' command to set flag's value.
 + s 0x100 1 // will add 'Small' flag
 + s 0x400 0 // will remove 'Medium' flag
 

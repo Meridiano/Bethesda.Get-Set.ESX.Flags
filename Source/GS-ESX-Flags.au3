@@ -8,6 +8,10 @@ EndIf
 
 ; === CONSOLE FUNCTIONS ===
 
+Func ConsoleInfo($sDescription)
+	ConsoleWrite($sDescription & @CRLF)
+EndFunc
+
 Func ConsoleInput($sDescription)
 	ConsoleWrite($sDescription)
 	While True
@@ -36,6 +40,11 @@ Func ConsoleError($sDescription, $sLocal)
 EndFunc
 
 ; === UTILITY FUNCTIONS ===
+
+Func ConfigPath()
+	Local $sTrimmed = StringTrimRight(@ScriptFullPath, 3)
+	Return ($sTrimmed & "ini")
+EndFunc
 
 Func BackupFile($sPath)
 	Local $sTimeStamp = StringFormat("%s-%s-%s-%s-%s-%s", @YEAR, @MON, @MDAY, @HOUR, @MIN, @SEC)
@@ -100,12 +109,12 @@ Func GetFlags($sPath)
 EndFunc
 
 Func ShowOne($iAll, $iOne, $sKey)
-	Local $sConfig = StringTrimRight(@ScriptFullPath, 3) & "ini"
+	Local $sConfig = ConfigPath()
 	Local $sDetails = IniRead($sConfig, "Flags", $sKey, $sKey)
 	If (StringLen($sDetails) = 2) Then $sDetails = "Unknown " & $sDetails
 	Local $bFlag = (BitAND($iAll, $iOne) <> 0)
 	Local $sInfo = StringFormat("%10s %s : %s", IntToHex($iOne), $bFlag ? "+" : " ", $sDetails)
-	ConsoleWrite($sInfo & @CRLF)
+	ConsoleInfo($sInfo)
 EndFunc
 
 Func ShowAll($iFlags)
@@ -188,12 +197,25 @@ EndFunc
 
 ; === CORE FUNCTIONS ===
 
+Func UpdateConfig()
+	Local $sFilePath = ConfigPath()
+	If FileExists($sFilePath) Then Return
+	ConsoleInfo("Updating config from web...")
+	Local $sWebPath = "https://raw.githubusercontent.com/Meridiano/Starfield.Get-Set.ESX.Flags/main/Source/GS-ESX-Flags.ini"
+	Local $iBytes = InetGet($sWebPath, $sFilePath, 1 + 2, 0)
+	If ($iBytes > 0) Then
+		ConsoleInfo("Done, " & $iBytes & " bytes downloaded")
+	Else
+		ConsoleError("Updating config failed", "UpdateConfig:A")
+	EndIf
+EndFunc
+
 Func OpenPlugin()
 	Local $sPath = FileOpenDialog("Open ESX", @ScriptDir, "ESX Plugin (*.esp;*.esm;*.esl)", 1)
 	If (@Error = 0) Then
 		Local $bValid = ValidPlugin($sPath)
 		If $bValid Then
-			ConsoleWrite("Selected plugin = " & $sPath & @CRLF)
+			ConsoleInfo("Selected plugin = " & $sPath)
 			Return $sPath
 		EndIf
 	Else
@@ -202,6 +224,7 @@ Func OpenPlugin()
 EndFunc
 
 Func MainLoop()
+	UpdateConfig()
 	Local $sPath = OpenPlugin()
 	While True
 		Local $sCommand = ConsoleInput("Select your action, G=Get, S=Set > ")

@@ -27,5 +27,5 @@ URL file provided in release points to any plain text web resource that will be 
 You can remove the default file and create your own instead, this means custom definitions are supported.
 
 This repo has 2 related files:
-+ [Starfield](./Source./GS-ESX-Flags.Starfield.ini) is default.
-+ [Skyrim SE](./Source./GS-ESX-Flags.SkyrimSE.ini) can be switched to.
++ [Starfield](./Source/GS-ESX-Flags.Starfield.ini) is default.
++ [Skyrim SE](./Source/GS-ESX-Flags.SkyrimSE.ini) can be switched to.

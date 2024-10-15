@@ -41,10 +41,9 @@ EndFunc
 
 ; === UTILITY FUNCTIONS ===
 
-Func ConfigPath($bURL)
+Func ConfigPath()
 	Local $sTrimmed = StringTrimRight(@ScriptFullPath, 3)
-	Local $sExtension = $bURL ? "url" : "ini"
-	Return ($sTrimmed & $sExtension)
+	Return ($sTrimmed & "ini")
 EndFunc
 
 Func BackupFile($sPath)
@@ -110,7 +109,7 @@ Func GetFlags($sPath)
 EndFunc
 
 Func ShowOne($iAll, $iOne, $sKey)
-	Local $sConfig = ConfigPath(False)
+	Local $sConfig = ConfigPath()
 	Local $sDetails = IniRead($sConfig, "Flags", $sKey, $sKey)
 	If (StringLen($sDetails) = 2) Then $sDetails = "Unknown " & $sDetails
 	Local $bFlag = (BitAND($iAll, $iOne) <> 0)
@@ -199,11 +198,10 @@ EndFunc
 ; === CORE FUNCTIONS ===
 
 Func UpdateConfig()
-	Local $sFilePath = ConfigPath(False)
-	If FileExists($sFilePath) Then Return
-	Local $sWebPath = IniRead(ConfigPath(True), "InternetShortcut", "URL", "https://raw.githubusercontent.com/Meridiano/Starfield.Get-Set.ESX.Flags/refs/heads/main/Source/GS-ESX-Flags.ini")
-	Local $sFileName = StringRegExpReplace($sWebPath, "(.+)\/(.+)", "$2")
-	ConsoleInfo("Updating config from web, file name = " & $sFileName)
+	Local $sFilePath = ConfigPath()
+	Local $sWebPath = IniRead($sFilePath, "Config", "URL", "")
+	If ($sWebPath = "") Then Return
+	ConsoleInfo("Updating config from web, URL = " & $sWebPath)
 	Local $iBytes = InetGet($sWebPath, $sFilePath, 1 + 2, 0)
 	If ($iBytes > 0) Then
 		ConsoleInfo("Done, " & $iBytes & " bytes downloaded")

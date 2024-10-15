@@ -201,8 +201,9 @@ EndFunc
 Func UpdateConfig()
 	Local $sFilePath = ConfigPath(False)
 	If FileExists($sFilePath) Then Return
-	ConsoleInfo("Updating config from web...")
 	Local $sWebPath = IniRead(ConfigPath(True), "InternetShortcut", "URL", "https://raw.githubusercontent.com/Meridiano/Starfield.Get-Set.ESX.Flags/refs/heads/main/Source/GS-ESX-Flags.ini")
+	Local $sFileName = StringRegExpReplace($sWebPath, "(.+)\/(.+)", "$2")
+	ConsoleInfo("Updating config from web, file name = " & $sFileName)
 	Local $iBytes = InetGet($sWebPath, $sFilePath, 1 + 2, 0)
 	If ($iBytes > 0) Then
 		ConsoleInfo("Done, " & $iBytes & " bytes downloaded")

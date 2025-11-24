@@ -57,20 +57,11 @@ Func IntToHex($iValue)
 	Return StringRegExpReplace($sHex, "(0x)(0*)(.+)", "$1$3")
 EndFunc
 
-Func BinaryL2R($iData)
+Func BinaryFlip($iData)
 	Local $sNewData = ""
 	For $iIndex = 1 To BinaryLen($iData) Step 1
 		Local $sChunk = StringTrimLeft(String(BinaryMid($iData, $iIndex, 1)), 2)
 		$sNewData = $sChunk & $sNewData
-	Next
-	Return Binary("0x" & $sNewData)
-EndFunc
-
-Func BinaryR2L($iData)
-	Local $sNewData = ""
-	For $iIndex = BinaryLen($iData) To 1 Step -1
-		Local $sChunk = StringTrimLeft(String(BinaryMid($iData, $iIndex, 1)), 2)
-		$sNewData = $sNewData & $sChunk
 	Next
 	Return Binary("0x" & $sNewData)
 EndFunc
@@ -98,7 +89,7 @@ Func GetFlags($sPath)
 		ConsoleError("Plugin stream error", "GetFlags:A")
 	Else
 		Local $iDataLeft = BinaryMid(FileRead($hPlugin, 12), 9, 4)
-		Local $iDataRight = BinaryL2R($iDataLeft)
+		Local $iDataRight = BinaryFlip($iDataLeft)
 		FileClose($hPlugin)
 		If (BinaryLen($iDataRight) = 4) Then
 			Return Number(String($iDataRight), 2)
@@ -166,7 +157,7 @@ Func SetFlag($sPath, $sCommand, $iAll)
 			Local $iNewFlags = $bNew ? ($iAll + $iOne) : ($iAll - $iOne)
 			Local $sNewFlags = "0x" & Hex($iNewFlags, 8)
 			Local $iDataRight = Binary($sNewFlags)
-			Local $iDataLeft = BinaryR2L($iDataRight)
+			Local $iDataLeft = BinaryFlip($iDataRight)
 			Local $hPlugin = FileOpen($sPath, 16)
 			If ($hPlugin < 0) Then
 				ConsoleWarning("Plugin stream error", "SetFlag:B")
